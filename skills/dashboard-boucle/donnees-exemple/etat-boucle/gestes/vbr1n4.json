@@ -1,0 +1,11 @@
+{
+ "titre": "Trier le message puis consigne adaptée",
+ "description": "Classer le message, puis consigne adaptée",
+ "famille": "trier puis spécialiser par type de message",
+ "parent": null,
+ "journal": {
+  "probleme": "Une seule consigne ne convient pas à tous les types de messages.",
+  "idee": "Un premier appel classe le message, le second utilise la consigne de sa classe.",
+  "attendu": "Les cas flous et multiples montent ensemble."
+ }
+}

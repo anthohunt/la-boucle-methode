@@ -1,0 +1,11 @@
+{
+ "titre": "Une consigne par type de message",
+ "description": "Une consigne par type de message",
+ "famille": "trier puis spécialiser par type de message",
+ "parent": null,
+ "journal": {
+  "probleme": "Les messages flous reçoivent la consigne des messages clairs.",
+  "idee": "Écrire une consigne dédiée aux messages flous.",
+  "attendu": "Les cas flous montent."
+ }
+}

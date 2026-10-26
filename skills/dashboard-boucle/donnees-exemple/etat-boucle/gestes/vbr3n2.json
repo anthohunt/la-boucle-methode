@@ -1,0 +1,11 @@
+{
+ "titre": "Normalisation des heures",
+ "description": "Normalisation des heures par le programme",
+ "famille": "le programme aide le modèle",
+ "parent": null,
+ "journal": {
+  "probleme": "Les heures sont écrites de plusieurs façons.",
+  "idee": "Le programme normalise le format des heures.",
+  "attendu": "Moins d'heures illisibles."
+ }
+}

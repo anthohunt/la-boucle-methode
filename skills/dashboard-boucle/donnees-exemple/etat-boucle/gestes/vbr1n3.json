@@ -1,0 +1,11 @@
+{
+ "titre": "Réponse en lignes simples",
+ "description": "Réponse en lignes simples",
+ "famille": "retouche de la consigne",
+ "parent": null,
+ "journal": {
+  "probleme": "Le format de réponse est parfois illisible.",
+  "idee": "Demander des lignes simples plutôt qu'un objet structuré.",
+  "attendu": "Moins de réponses illisibles."
+ }
+}

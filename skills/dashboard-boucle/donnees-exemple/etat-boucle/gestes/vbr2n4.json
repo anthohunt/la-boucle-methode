@@ -1,0 +1,11 @@
+{
+ "titre": "Heures incohérentes écartées par le programme",
+ "description": "Contrôle de cohérence des heures par le programme",
+ "famille": "le programme aide le modèle",
+ "parent": null,
+ "journal": {
+  "probleme": "Des heures hors des horaires d'ouverture passent.",
+  "idee": "Le programme refuse une heure hors horaires.",
+  "attendu": "Moins de réservations impossibles."
+ }
+}

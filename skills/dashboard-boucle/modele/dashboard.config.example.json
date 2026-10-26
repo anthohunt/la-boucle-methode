@@ -1,0 +1,18 @@
+{
+  "titre": "Tickets → réservations",
+  "surtitre": "Boucle d'amélioration automatique",
+  "intro": "Un petit modèle lit une demande adressée à une bibliothèque fictive et doit en tirer les réservations à enregistrer. La boucle entraîne ses essais sur des cas dont elle voit les fautes, puis envoie à l'examen l'essai qui franchit un palier.",
+  "unite": ["demande", "demandes"],
+  "unite_vitesse": "demande",
+  "categories": {
+    "claire":    {"nom": "Une réservation claire",    "court": "Claire"},
+    "multiple":  {"nom": "Plusieurs réservations",    "court": "Plusieurs"},
+    "floue":     {"nom": "Réservation floue",         "court": "Floue"},
+    "vide":      {"nom": "Aucune réservation",        "court": "Aucune"},
+    "piege":     {"nom": "Piège (fausse date)",       "court": "Piège"},
+    "hostile":   {"nom": "Message malveillant",       "court": "Hostile"}
+  },
+  "tailles": {"entrainement": 120, "examen": 240, "verification": 90},
+  "progres_min": 5.0,
+  "lien": null
+}

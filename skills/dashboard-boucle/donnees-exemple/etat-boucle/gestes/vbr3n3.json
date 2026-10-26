@@ -1,0 +1,11 @@
+{
+ "titre": "Classer puis consigne adaptée, exemples variés",
+ "description": "Classer, puis consigne adaptée et exemples variés",
+ "famille": "trier puis spécialiser par type de message",
+ "parent": null,
+ "journal": {
+  "probleme": "Le tri et les exemples doivent aller ensemble.",
+  "idee": "Combiner le tri par type et des exemples variés.",
+  "attendu": "Tous les types montent."
+ }
+}

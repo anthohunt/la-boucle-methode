@@ -1,0 +1,126 @@
+{
+ "champion": {
+  "tag": "vbr3n3",
+  "vec": {
+   "claire": 55.7,
+   "multiple": 37.0,
+   "floue": 33.1,
+   "vide": 59.1,
+   "piege": 47.3,
+   "hostile": 36.6
+  },
+  "entrainement": {
+   "moy": 96.0,
+   "jeu": "entrainement-v1.jsonl"
+  },
+  "verification": {
+   "moy": 43.0
+  }
+ },
+ "examens": [
+  {
+   "tour": 1,
+   "essai": 4,
+   "tag": "vbr1n4",
+   "examen": 36.2,
+   "examen_vec": {
+    "claire": 41.3,
+    "multiple": 28.9,
+    "floue": 48.3,
+    "vide": 24.1,
+    "piege": 32.5,
+    "hostile": 42.0
+   },
+   "delta": 8.2,
+   "gagnes": 31,
+   "perdus": 11,
+   "note_entrainement": 53.5,
+   "recorrection": {
+    "delta": 7.4
+   },
+   "verification": {
+    "note": 35.1,
+    "ancienne": 27.0
+   },
+   "verdict": "nouvelle meilleure version",
+   "vitesse": 6.4,
+   "conditions": {
+    "poste": "machine-A",
+    "gpu": false
+   }
+  },
+  {
+   "tour": 2,
+   "essai": 5,
+   "tag": "vbr2n5",
+   "examen": 37.5,
+   "examen_vec": {
+    "claire": 34.7,
+    "multiple": 49.4,
+    "floue": 51.4,
+    "vide": 28.8,
+    "piege": 29.6,
+    "hostile": 31.1
+   },
+   "delta": 1.3,
+   "gagnes": 20,
+   "perdus": 17,
+   "note_entrainement": 75.0,
+   "recorrection": null,
+   "verification": null,
+   "verdict": "echec examen",
+   "vitesse": 9.8,
+   "conditions": {
+    "poste": "machine-A",
+    "gpu": false
+   }
+  },
+  {
+   "tour": 3,
+   "essai": 3,
+   "tag": "vbr3n3",
+   "examen": 44.8,
+   "examen_vec": {
+    "claire": 38.2,
+    "multiple": 40.9,
+    "floue": 41.3,
+    "vide": 34.6,
+    "piege": 54.9,
+    "hostile": 58.9
+   },
+   "delta": 7.3,
+   "gagnes": 33,
+   "perdus": 15,
+   "note_entrainement": 96.0,
+   "recorrection": {
+    "delta": 6.1
+   },
+   "verification": {
+    "note": 43.0,
+    "ancienne": 35.1
+   },
+   "verdict": "nouvelle meilleure version",
+   "vitesse": 7.1,
+   "conditions": {
+    "poste": "machine-A",
+    "gpu": false
+   }
+  }
+ ],
+ "paliers": [
+  50.0,
+  73.5,
+  95.0,
+  100.0
+ ],
+ "echecsExamen": 0,
+ "n1": {
+  "tour": 4,
+  "phase": "entrainement",
+  "tourEntrainement": 1,
+  "palier": 100.0,
+  "racineN1": {
+   "moy": 96.0
+  }
+ }
+}

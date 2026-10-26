@@ -1,0 +1,11 @@
+{
+ "titre": "Exemples plus variés",
+ "description": "Exemples plus variés dans la consigne",
+ "famille": "retouche de la consigne",
+ "parent": null,
+ "journal": {
+  "probleme": "Les exemples se ressemblent trop.",
+  "idee": "Remplacer deux exemples par des cas plus différents.",
+  "attendu": "Meilleure généralisation."
+ }
+}

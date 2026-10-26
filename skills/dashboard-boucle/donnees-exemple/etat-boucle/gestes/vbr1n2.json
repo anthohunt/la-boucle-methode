@@ -1,0 +1,11 @@
+{
+ "titre": "Dates passées refusées par le programme",
+ "description": "Le programme refuse les dates passées",
+ "famille": "le programme aide le modèle",
+ "parent": null,
+ "journal": {
+  "probleme": "Les fausses dates (le jour de l'envoi recopié) passent.",
+  "idee": "Un contrôle de code écarte toute date antérieure à l'envoi.",
+  "attendu": "Les pièges tombent."
+ }
+}
