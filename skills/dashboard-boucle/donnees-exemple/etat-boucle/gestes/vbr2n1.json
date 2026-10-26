@@ -1,0 +1,11 @@
+{
+ "titre": "Relecture des dates par un second appel",
+ "description": "Relecture des dates par un second appel",
+ "famille": "relecture / vérification",
+ "parent": null,
+ "journal": {
+  "probleme": "Les dates relatives (« jeudi prochain ») sont mal résolues.",
+  "idee": "Un second appel relit les dates du résultat.",
+  "attendu": "Moins d'erreurs de date."
+ }
+}

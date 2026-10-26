@@ -1,0 +1,11 @@
+{
+ "titre": "Consigne plus longue",
+ "description": "Consigne plus longue avec règles",
+ "famille": "retouche de la consigne",
+ "parent": null,
+ "journal": {
+  "probleme": "Les règles de la consigne se contredisent.",
+  "idee": "Réécrire les règles dans l'ordre.",
+  "attendu": "Moins de contradictions."
+ }
+}

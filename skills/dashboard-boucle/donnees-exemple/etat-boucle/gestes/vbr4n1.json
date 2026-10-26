@@ -1,0 +1,11 @@
+{
+ "titre": "Relecture des heures",
+ "description": "Relecture des heures par un second appel",
+ "famille": "relecture / vérification",
+ "parent": null,
+ "journal": {
+  "probleme": "Quelques heures restent incohérentes.",
+  "idee": "Un second appel relit les heures.",
+  "attendu": "Moins d'erreurs d'heure."
+ }
+}

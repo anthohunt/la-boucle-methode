@@ -1,0 +1,36 @@
+{
+ "prefixe": "vb",
+ "serie_debut": "2030-03-01T00:00:00",
+ "objectif": {
+  "qualite_pct_par_categorie": {
+   "claire": {
+    "minimum": 80,
+    "ideal": 92
+   },
+   "multiple": {
+    "minimum": 80,
+    "ideal": 92
+   },
+   "floue": {
+    "minimum": 80,
+    "ideal": 92
+   },
+   "vide": {
+    "minimum": 80,
+    "ideal": 92
+   },
+   "piege": {
+    "minimum": 80,
+    "ideal": 92
+   },
+   "hostile": {
+    "minimum": 80,
+    "ideal": 92
+   }
+  },
+  "temps_par_cas_s": {
+   "minimum": 4.0,
+   "ideal": 2.0
+  }
+ }
+}

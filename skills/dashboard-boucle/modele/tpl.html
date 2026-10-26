@@ -1,0 +1,572 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tableau de la boucle</title>
+<!-- SOBRIETE : une ligne = libelle court + valeur + 5 mots au plus, resultat
+     d'abord, aucune phrase qui explique, aucun chiffre en double, aucun code interne. Chaque ligne doit porter une information utile.
+     Gabarit AUTONOME : tout le CSS est ici.
+     ARCHITECTURE A DEUX NIVEAUX — frise en deux blocs (niveau 1 entrainement autonome / niveau 2 examen), journal par cycle
+     (essais entraines version par version, palier, examen, recorrection, verification). Graphiques = notes d'EXAMEN seulement.
+     JOURNAL FUSIONNE DANS LA PASSE : plus de section Journal. Chaque etape de la frise porte 1 ou 2 lignes de
+     journal (ce qui a ete retenu / a marche / n'a pas marche) ; le detail vit dans la fenetre de l'etape. Les passes precedentes
+     = meme rendu, condense. Ordre : en-tete · passe en cours · passes precedentes · progres · par categorie. Mobile d'abord. -->
+<style>
+:root{
+  --ground:#f5f3ef;--panel:#fff;--panel2:#faf9f6;--ink:#15243a;--soft:#5b6b82;--line:#dfe4ec;
+  --brand:#0a5ad6;--brand-soft:#e7f0fd;
+  --ok:#127a54;--ok-bg:#e2f2ea;--warn:#a55f00;--warn-bg:#fbeede;--ko:#b23b2e;--ko-bg:#f8e6e2;
+  --zone:rgba(18,122,84,.12);--zone-line:#2f9a6c;--grid:rgba(120,130,150,.2);
+  --sQ:#2a78d6;--sV:#1baf7a;--sT:#4a3aa7;--champ:#15243a;
+  --mono:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0d1420;--panel:#151f30;--panel2:#111a29;--ink:#e7edf6;--soft:#93a2b8;--line:#26344a;
+  --brand:#4f9cff;--brand-soft:#152844;
+  --ok:#54c08a;--ok-bg:#122a20;--warn:#e2a94a;--warn-bg:#2c2413;--ko:#e58a7c;--ko-bg:#2e1a17;
+  --zone:rgba(84,192,138,.13);--zone-line:#54c08a;--grid:rgba(160,175,200,.16);
+  --sQ:#3987e5;--sV:#199e70;--sT:#9085e9;--champ:#e7edf6;
+}}
+:root[data-theme="dark"]{
+  --ground:#0d1420;--panel:#151f30;--panel2:#111a29;--ink:#e7edf6;--soft:#93a2b8;--line:#26344a;
+  --brand:#4f9cff;--brand-soft:#152844;
+  --ok:#54c08a;--ok-bg:#122a20;--warn:#e2a94a;--warn-bg:#2c2413;--ko:#e58a7c;--ko-bg:#2e1a17;
+  --zone:rgba(84,192,138,.13);--zone-line:#54c08a;--grid:rgba(160,175,200,.16);
+  --sQ:#3987e5;--sV:#199e70;--sT:#9085e9;--champ:#e7edf6;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.45;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:22px 16px 60px}
+.eyebrow{font:700 .7rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--brand)}
+.tete-liens{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px}
+.lien-ext{font:600 .78rem var(--sans);color:var(--brand);text-decoration:none;white-space:nowrap}.lien-ext:hover{text-decoration:underline}
+h1{font-size:1.6rem;line-height:1.15;margin:4px 0 4px;letter-spacing:-.02em}
+.lede{margin:0 0 16px;color:var(--soft);font-size:.9rem;max-width:62ch}
+h2{font:700 .74rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:30px 0 10px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+h2 small{font:500 .74rem var(--sans);letter-spacing:0;text-transform:none}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--soft)}
+/* --- en-tete champion --- */
+.hero{padding:16px 16px 14px}
+.hero .k{font:700 .7rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.hero .row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:2px}
+.hero .nom{font-weight:700;font-size:1.08rem;line-height:1.25}
+.hero .big{font:800 2.2rem/1 var(--sans);font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
+.hero .gain{font-size:.85rem;color:var(--soft);margin-top:4px}
+.hero .gain b{color:var(--ok)}
+.gauge{position:relative;height:12px;border-radius:6px;background:var(--grid);margin:16px 0 4px}
+.gauge .z{position:absolute;top:0;bottom:0;background:var(--zone);border-left:2px solid var(--zone-line);border-right:2px solid var(--zone-line)}
+.gauge .f{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--sQ)}
+.gauge .d{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--soft)}
+.gl{position:relative;height:16px;font-size:.68rem;color:var(--soft)}
+.gl span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.hero .reste{font-size:.86rem;margin-top:6px}
+.hero .etat{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;border-top:1px solid var(--line);margin-top:12px;padding-top:12px;font-size:.86rem}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font:700 .74rem var(--sans);white-space:nowrap}
+.pill.on{background:var(--brand-soft);color:var(--brand)}
+.pill.on:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--brand);animation:pp 1.4s infinite}
+.pill.off{background:var(--ground);color:var(--soft)}
+@keyframes pp{50%{opacity:.2}}
+@media (prefers-reduced-motion:reduce){.pill.on:before,.st.encours .ic:after{animation:none}}
+/* --- badges verdict --- */
+.vd{display:inline-block;font:700 .7rem var(--sans);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.v-progres{background:var(--ok-bg);color:var(--ok)}.v-stagnation{background:var(--warn-bg);color:var(--warn)}
+.v-recul{background:var(--ko-bg);color:var(--ko)}.v-echec_examen,.v-sans_palier{background:var(--warn-bg);color:var(--warn)}.v-encours,.v-attente{background:var(--brand-soft);color:var(--brand)}.v-echec{background:var(--ground);color:var(--soft)}
+/* --- frise --- */
+.frise{padding:14px 14px 4px}
+.frise .fh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.frise .fh b{font-size:.95rem}.frise .fh span{font-size:.76rem;color:var(--soft);white-space:nowrap}
+.bar{height:4px;border-radius:2px;background:var(--grid);margin:0 0 12px;overflow:hidden}.bar i{display:block;height:100%;background:var(--brand)}
+.st{display:grid;grid-template-columns:22px 1fr auto;gap:0 10px;position:relative;padding:0 0 12px;cursor:pointer}
+.st:before{content:"";position:absolute;left:10px;top:22px;bottom:0;width:2px;background:var(--line)}.st:last-child:before{display:none}
+.st .ic{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 .7rem var(--sans);border:2px solid var(--line);background:var(--panel);color:var(--soft);z-index:1}
+.st.fait .ic{background:var(--ok);border-color:var(--ok);color:#fff}
+.st.encours .ic{border-color:var(--brand)}.st.encours .ic:after{content:"";width:8px;height:8px;border-radius:50%;background:var(--brand);animation:pp 1.4s infinite}
+.st .t{font-weight:700;font-size:.9rem;line-height:22px}.st.avenir .t{color:var(--soft);font-weight:600}
+.st .du{font:600 .72rem var(--mono);color:var(--soft);line-height:22px;white-space:nowrap}.st.encours .du{color:var(--brand)}
+.st .r{grid-column:2/4;font-size:.8rem;color:var(--soft);line-height:1.35}.st.encours .r{color:var(--ink)}
+.st.inutile .ic{border-style:dashed}.st.inutile .t{color:var(--soft);font-weight:500;text-decoration:line-through}.st.inutile .r{font-style:italic}
+.cpt{grid-column:2/4;display:grid;grid-template-columns:1fr auto;gap:3px 8px;margin-top:7px;padding:8px 10px;background:var(--brand-soft);border-radius:10px}
+.cpt .n{grid-column:1/3;font-size:.8rem}.cpt .n b{font-family:var(--mono)}
+.cpt .b{height:7px;border-radius:4px;background:var(--panel);overflow:hidden;align-self:center}.cpt .b i{display:block;height:100%;background:var(--brand);transition:width .6s}
+.cpt .p{font:700 .72rem var(--mono);color:var(--brand)}
+/* sous chaque barre, les 4 postes (cas notes pour CETTE mesure + paquet en cours / libre / occupe) */
+.cpt .ps{grid-column:1/3;display:grid;grid-template-columns:auto auto 1fr;gap:1px 8px;margin-top:3px;font-size:.74rem;color:var(--soft)}
+.cpt .ps b{font:700 .72rem var(--mono);color:var(--ink)}.cpt .ps .on{color:var(--brand);font-weight:600}.cpt .ps span{white-space:nowrap}
+.cpt .ps .e{white-space:normal}
+/* a 390 px les noms de machine sont longs : la mesure prend toute la largeur de l'etape pour garder poste, notes, etat sur UNE ligne */
+@media(max-width:520px){.st>.cpt{grid-column:1/4;position:relative;z-index:1}.cpt .ps{gap:1px 5px;font-size:.7rem}.cpt .ps b{font-size:.62rem}.cpt .ps .e{white-space:nowrap}}
+.cpt .at{grid-column:1/3;font-size:.74rem;color:var(--soft);font-style:italic}
+.para{border-top:1px dashed var(--line);margin:4px -14px 0;padding:10px 14px 12px}
+.niv{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 8px;margin:6px 0 8px;padding-top:8px;border-top:1px solid var(--line)}
+.niv b{font:700 .72rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}.niv span{font-size:.74rem;color:var(--soft);text-align:right}.niv .seuil{font:700 1rem var(--sans);color:var(--ink,inherit)}.niv small{display:block;font-size:.7rem}
+.vs{grid-column:1/3;display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:6px;font-size:.78rem;color:var(--soft)}
+.vs span{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:1px 7px;white-space:nowrap}.vs span b{color:var(--ink);font-variant-numeric:tabular-nums}
+.vs span.ok{border-color:var(--ok);background:var(--ok-bg)}
+/* --- arbre du niveau 1 --- */
+.arbre{margin:4px 0 6px}
+.nd{position:relative;display:grid;grid-template-columns:1fr auto;gap:1px 8px;padding:6px 8px 6px 10px;margin:3px 0;border:1px solid var(--line);border-left:3px solid var(--sQ);border-radius:9px;background:var(--panel2);cursor:pointer;font-size:.82rem}
+.nd .c{line-height:1.3}.nd .c small{display:block;color:var(--soft);font-size:.72rem}
+.nd .n{font:800 .9rem var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.nd .n small{display:block;font:600 .66rem var(--sans);color:var(--soft)}
+.nd.racine{border-left-color:var(--champ);background:var(--panel)}
+.nd.elaguer,.nd.impasse,.nd.ecarte,.nd.panne{border-left-color:var(--line);opacity:.62}.nd.elaguer .c{text-decoration:line-through;text-decoration-color:var(--soft)}
+.nd.examen{border-left-color:var(--ok);border-color:var(--ok);background:var(--ok-bg)}
+.nd.a{border-left-style:dashed}
+.nd .cpt{grid-column:1/3;margin-top:4px}
+.ind{position:absolute;left:-9px;top:-4px;bottom:50%;width:8px;border-left:1.5px solid var(--line);border-bottom:1.5px solid var(--line);border-bottom-left-radius:6px}
+.lga{display:flex;flex-wrap:wrap;gap:3px 12px;font-size:.72rem;color:var(--soft);margin:2px 0 6px}
+.ex{border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:var(--panel2)}.ex.ok{border-color:var(--ok)}.ex.ko{border-color:var(--warn)}
+.ex .t{font-weight:700;font-size:.93rem}.ex p{font-size:.84rem;margin-top:4px}
+.para .k{font:700 .7rem var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.para .cpt{margin-top:6px}
+/* --- graphiques --- */
+.seg{display:inline-grid;grid-auto-flow:column;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:2px}
+.seg button{border:0;background:transparent;border-radius:8px;padding:5px 10px;font:600 .78rem var(--sans);color:var(--soft);cursor:pointer}
+.seg button.on{background:var(--brand-soft);color:var(--brand)}
+.chart{padding:10px 8px 6px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .ct{display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin:0 6px 2px;font-weight:700;font-size:.84rem}
+.chart .ct small{font:600 .7rem var(--sans);color:var(--soft);white-space:nowrap}
+.lg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.76rem;color:var(--soft);margin:8px 6px 2px}
+.lg span{display:inline-flex;align-items:center;gap:6px}
+.lg i{display:inline-block}
+.cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(max-width:820px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.cats{gap:8px}.cats .chart{padding:8px 4px 4px}.cats .ct{font-size:.76rem;margin:0 4px 2px;flex-direction:column;gap:0}}
+.vide{padding:18px 16px;color:var(--soft);font-size:.86rem;text-align:center}
+.hit{cursor:pointer}
+/* --- lignes de journal sous chaque etape, arbre repliable, passes precedentes --- */
+.st .r b{color:var(--ink);font-variant-numeric:tabular-nums}
+.st .r .al{color:var(--warn)}
+.st .r .ko{color:var(--ko)}
+details.ar{grid-column:2/4;margin-top:4px}
+details.ar summary{cursor:pointer;font:600 .78rem var(--sans);color:var(--brand);list-style:none}
+details.ar summary::-webkit-details-marker{display:none}
+details.ar summary:before{content:"▸ ";}details.ar[open] summary:before{content:"▾ ";}
+.pp{padding:14px 14px 4px;margin-bottom:12px}
+.pp>.h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.pp>.h b{font-size:1rem}
+.cause{font-size:.85rem;padding:6px 0;border-bottom:1px solid var(--line)}.cause:last-child{border-bottom:0}.cause .num{font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chips span{font-size:.74rem;background:var(--ground);border-radius:7px;padding:2px 7px;white-space:nowrap}
+.chips b{font-variant-numeric:tabular-nums}
+/* --- fenetre --- */
+#modal{position:fixed;inset:0;background:rgba(10,20,35,.5);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+@media(min-width:600px){#modal{align-items:center;padding:16px}}
+#modal[hidden]{display:none}
+#modal .box{background:var(--panel);border:1px solid var(--line);border-radius:16px 16px 0 0;max-width:540px;width:100%;max-height:85vh;overflow:auto;padding:18px 18px 22px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+@media(min-width:600px){#modal .box{border-radius:16px}}
+#modal .k{font:700 .7rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--brand);margin:14px 0 3px}
+#modal h3{margin:2px 36px 0 0;font-size:1.08rem;line-height:1.3}#modal p{margin:0;font-size:.9rem;line-height:1.45}
+#modal .x{float:right;border:0;background:var(--ground);border-radius:50%;width:32px;height:32px;font-size:1.1rem;cursor:pointer;color:var(--ink)}
+#modal a{color:var(--brand)}
+.maj{font-size:.72rem;color:var(--soft);text-align:center;margin-top:24px}
+/* graphique de TOUTES les tentatives notees a l'entrainement (niveau 1) — couleur = famille d'idees
+   (3 premieres familles, palette validee toutes paires ; au-dela et sans famille = gris), forme = decision */
+:root{--f1:#2a78d6;--f2:#eb6834;--f3:#1baf7a;--fz:#8a94a3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--f1:#3987e5;--f2:#d95926;--f3:#199e70;--fz:#7d8899}}
+:root[data-theme="dark"]{--f1:#3987e5;--f2:#d95926;--f3:#199e70;--fz:#7d8899}
+#gN1{position:relative;grid-column:2/4;min-width:0;padding:8px 0 4px;margin:6px 0 2px;cursor:default}
+@media(max-width:520px){#gN1{grid-column:1/4}}
+#gN1 .pt{cursor:pointer;outline:none}
+#gN1 .pt:focus-visible{stroke:var(--brand);stroke-width:2}
+#tipN1{position:absolute;z-index:5;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;
+  box-shadow:0 6px 20px rgba(0,0,0,.14);font-size:.78rem;line-height:1.35;max-width:250px;color:var(--ink)}
+#tipN1 b.v{font-size:1rem;font-variant-numeric:tabular-nums}
+#tipN1 .t{font-weight:600;margin:2px 0 3px}
+#tipN1 .m{color:var(--soft)}
+#tipN1 i.k{display:inline-block;width:12px;border-top:3px solid;border-radius:2px;vertical-align:middle;margin-right:5px}
+.lgN1 svg{width:14px;height:14px;overflow:visible}
+.noteN1{font-size:.72rem;color:var(--soft);margin:4px 6px 2px}
+/* en tete de l'etape Entrainement de l'arbre,
+   bloc « En test maintenant » (une carte par branche en mesure) puis « Resultats » (une ligne par branche mesuree, note decroissante) */
+.et,.res{grid-column:2/4;min-width:0;margin-top:7px;cursor:default}
+@media(max-width:520px){.et,.res{grid-column:1/4;position:relative;z-index:1}}
+.et .k,.res .k{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font:700 .68rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--brand);margin:0 0 4px}
+.res .k{color:var(--soft)}.et .k small,.res .k small{font:600 .72rem var(--sans);letter-spacing:0;text-transform:none;color:var(--soft);white-space:nowrap}
+.eq{padding:8px 10px;margin-bottom:6px;background:var(--brand-soft);border-radius:10px;display:grid;grid-template-columns:1fr auto;gap:2px 8px;font-size:.8rem}
+.eq .ti{font-weight:700;font-size:.86rem;line-height:1.3}.eq .ti small{display:block;font:600 .7rem var(--sans);color:var(--soft)}
+.eq .no{font:800 .95rem var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;color:var(--brand)}
+.eq .li{grid-column:1/3;color:var(--soft);line-height:1.35}.eq .li b{color:var(--ink);font-variant-numeric:tabular-nums}
+.eq .ba{grid-column:1/3;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:3px 0 1px}
+.eq .ba span{height:7px;border-radius:4px;background:var(--panel);overflow:hidden}.eq .ba i{display:block;height:100%;background:var(--brand);transition:width .6s}
+.eq .ba em{font:700 .72rem var(--mono);font-style:normal;color:var(--brand);white-space:nowrap}
+.eq .po{grid-column:1/3;display:flex;flex-wrap:wrap;gap:3px 5px;margin-top:2px}
+.eq .po span{font-size:.7rem;background:var(--panel);border-radius:6px;padding:1px 6px;white-space:nowrap;color:var(--soft)}
+.eq .po span b{font:700 .68rem var(--mono);color:var(--ink)}.eq .po span.on{color:var(--brand)}.eq .po span.on:before{content:"● ";font-size:.6rem}
+.fd{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:baseline}
+.rl{display:grid;grid-template-columns:1fr auto;gap:0 8px;padding:5px 8px;border-bottom:1px solid var(--line);font-size:.8rem}
+.rl:last-of-type{border-bottom:0}
+.rl .ti{line-height:1.3}.rl .no{font:800 .86rem var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.rl .me{grid-column:1/3;font-size:.72rem;color:var(--soft);line-height:1.35}
+.rl .dc{font-weight:700}.rl .d-developper,.rl .d-garder{color:var(--brand)}.rl .d-panne{color:var(--ko)}.rl .d-examen{color:var(--ok)}
+.rl.best{background:var(--ok-bg);border-radius:8px;border-bottom-color:transparent}.rl.best .ti{font-weight:700}.rl.best .no{color:var(--ok)}
+.rl.faible{opacity:.62}
+.res .fi{font-size:.72rem;color:var(--soft);margin:5px 8px 0}
+</style>
+</head><body>
+<div class="wrap">
+  <div class="tete-liens"><div class="eyebrow" id="surtitre"></div><a class="lien-ext" id="lienext" hidden></a></div>
+  <h1 id="titre"></h1>
+  <p class="lede" id="intro" hidden></p>
+  <section id="hero" class="card hero"></section>
+  <h2>Passe en cours <small id="majp"></small></h2>
+  <div id="frise" class="card frise"></div>
+  <div id="prec"></div>
+  <h2>Progrès, passe par passe <span class="seg" id="seg"></span></h2>
+  <div id="gMain" class="card chart"></div>
+  <h2>Par catégorie</h2>
+  <div id="gCats" class="cats"></div>
+  <div class="maj" id="maj"></div>
+  <div id="modal" hidden><div class="box" id="mbox"></div></div>
+</div>
+<script>
+/*DATA*/
+var CFG=DATA.config||{},UN=(CFG.unite||["cas","cas"])[1],U1=(CFG.unite||["cas","cas"])[0],UV=CFG.unite_vitesse||U1;
+var NOMS={},COURT={};Object.keys(CFG.categories||{}).forEach(function(k){NOMS[k]=CFG.categories[k].nom||k;COURT[k]=CFG.categories[k].court||k;});
+var TL=CFG.tailles||{};
+(function(){function $(i){return document.getElementById(i);}document.title=CFG.titre||document.title;$("titre").textContent=CFG.titre||"";$("surtitre").textContent=CFG.surtitre||"";
+ if(CFG.intro){$("intro").textContent=CFG.intro;$("intro").hidden=false;}
+ if(CFG.lien&&CFG.lien.url){var a=$("lienext");a.href=CFG.lien.url;a.textContent=CFG.lien.texte||CFG.lien.url;a.hidden=false;}})();
+var VN={progres:"progrès",stagnation:"stagnation",recul:"moins bien",encours:"en cours",attente:"pas encore mesuré",echec:"pas mesuré",echec_examen:"échec à l'examen",sans_palier:"aucun essai au palier"};
+var NIV={1:["Niveau 1 · entraînement","autonome, "+(TL.entrainement?"sur ~"+TL.entrainement+" "+UN+" ":"")+"à fautes visibles"],2:["Niveau 2 · examen",(TL.examen?TL.examen+" "+UN+" scellés":"jeu scellé")+", puis recorrection et vérification"]};
+var H=DATA.histoire,PASSE=null,MET="q";
+function E(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function f1(x){return x==null?"—":(+x).toLocaleString("fr-FR",{minimumFractionDigits:1,maximumFractionDigits:1});}
+function f0(x){return x==null?"—":Math.round(+x).toLocaleString("fr-FR");}
+function sg(x){return x==null?"":(x>=0?"+":"−")+f1(Math.abs(x));}
+function pts(x){return sg(x)+" pt"+(Math.abs(x)>=2?"s":"");}
+function durS(s){return s?dur(1,1+s):"";}
+function dur(a,b){if(!a)return"";var s=Math.max(0,Math.round(((b||Date.now()/1000)-a)));var m=Math.floor(s/60);if(m<1)return"< 1 min";return m>=60?Math.floor(m/60)+" h "+String(m%60).padStart(2,"0"):m+" min";}
+/* TOUTES les heures en heure de PARIS (le serveur est en UTC) ; l'etape en cours montre son heure de depart */
+var FMT_H=new Intl.DateTimeFormat("fr-FR",{timeZone:"Europe/Paris",hour:"2-digit",minute:"2-digit"});
+var FMT_J=new Intl.DateTimeFormat("fr-FR",{timeZone:"Europe/Paris",day:"numeric",month:"long"});
+function hParis(ts){if(!ts)return"";var d=new Date(ts*1000);var h=FMT_H.format(d).replace(":"," h ");
+  return FMT_J.format(d)===FMT_J.format(new Date())?h:"le "+FMT_J.format(d)+" à "+h;}
+function depuis(ts){return ts?"depuis "+hParis(ts):"";}
+function utcParis(t){if(!t)return"";var d=new Date(String(t).replace(" ","T").replace(/Z?$/,"Z"));return isNaN(d)?String(t):hParis(d.getTime()/1000);}
+function cible(c){var C=H.cible;if(!C)return null;return c?C.par_cat[c]:C;}
+function mob(){return innerWidth<=520;}
+
+/* ---------- EN-TETE : la meilleure version (note d'examen) ; l'etat de la passe vit dans la frise, pas ici ---------- */
+function hero(){var el=document.getElementById("hero"),ch=H.champion||{},C=cible(),dep=H.depart;
+  if(ch.note==null){el.innerHTML="<div class='vide'>Pas encore mesurée.</div>";return;}
+  var h="<div class='k'>Meilleure version · examen</div><div class='row'><div class='nom'>"+(ch.depart?"Départ":E(ch.titre))+"</div><div class='big'>"+f1(ch.note)+" %</div></div>";
+  if(dep&&!ch.depart)h+="<div class='gain'><b>"+pts(ch.gain)+"</b> vs départ</div>";
+  if(C){h+="<div class='gauge' aria-hidden='true'><i class='z' style='left:"+C.minimum+"%;width:"+(C.ideal-C.minimum)+"%'></i><i class='f' style='width:"+ch.note+"%'></i>"+(dep&&!ch.depart?"<i class='d' style='left:"+dep.note+"%'></i>":"")+"</div>";
+    h+="<div class='gl'>"+(dep&&!ch.depart?"<span style='left:"+dep.note+"%'>départ</span>":"")+"<span style='left:"+((C.minimum+C.ideal)/2)+"%'>cible "+f0(C.minimum)+"–"+f0(C.ideal)+" %</span></div>";
+    var r=C.minimum-ch.note;h+="<div class='reste'>"+(r>0?"Manque <b class='num'>"+f1(r)+" pts</b>":"<b>Cible atteinte</b>")+"</div>";}
+  el.innerHTML=h;}
+
+/* ---------- LE JOURNAL EST DANS LA PASSE. Chaque etape faite ou en cours porte 1 ou 2 lignes : ce qui a ete
+   retenu, ce qui a marche, ce qui n'a pas marche. Resultat d'abord, libelle court + valeur, 5 mots au plus, aucun code, aucun
+   chiffre en double (le seuil n'est QUE sur la ligne Niveau 1). Le detail (causes, strategie entiere...) vit dans la fenetre. ---------- */
+function passeDe(t){return (H.passes||[]).filter(function(x){return x.tour===t;})[0]||{};}
+function meta(id){return (DATA.etapes||[]).filter(function(x){return x.id===id;})[0]||{};}
+function pl(n,s,p){return n+" "+(n>1?(p||s+"s"):s);}
+function lignes(p,id){var a=p.audit||{},A=p.arbre||[],x=p.examen||{},L=[];
+  var no=A.filter(function(n){return n.note!=null;}),el=A.filter(function(n){return n.decision==="elaguer";}).length;
+  switch(id){
+  case "n1_meilleure":if(p.racine&&p.racine.note!=null)L.push("<b>"+f1(p.racine.note)+" %</b>");break;
+  case "audit":if(a.fait&&a.texte)L.push(E(a.texte));break;
+  case "audit_correction":var ec=(a.ecarts||[]).filter(function(y){return y.corriger;});if(a.fait)L.push(ec.length?"Jeu trompeur : "+ec.map(function(y){return COURT[y.cat]||E(y.cat);}).join(", "):"Jeu fiable");break;
+  case "donnees":if(p.donnees)L.push(p.donnees.ok?E(p.donnees.texte||"jeu corrigé"):"<span class='ko'>refusé</span>");break;
+  case "plan":// strategie + critique + correction = une etape ; pistes retenues + critique -> correction (plan_depart.py)
+    var pr0=A.filter(function(n){return n.profondeur===1;}).sort(function(a,b){return a.id-b.id;});
+    if(pr0.length)L.push("Pistes : "+pr0.map(function(n){return E(n.court||n.changement);}).join(" · "));
+    var pd=p.plan;if(pd)L.push(pd.n_critiques?"Critique : "+pl(pd.n_critiques,"point")+" → "+(pd.corrigee?"<b>stratégie corrigée</b>":"rien à corriger"):"Critique : rien à corriger");
+    if(p.alerte)L.push("<span class='al'>⚠ "+E(p.alerte)+"</span>");break;
+  case "essais":var pr=A.filter(function(n){return n.profondeur===1;}).length;if(pr)L.push(pl(pr,"branche"));break;
+  case "controle":var ca=A.filter(function(n){return n.decision==="ecarte";}).length;if(A.length)L.push(ca?"<span class='ko'>"+pl(ca,"écartée")+"</span>":"aucune écartée");break;
+  case "entrainement":if(no.length){var b=no.reduce(function(m,n){return n.note>m.note?n:m;});L.push("Meilleure <b>"+f1(b.note)+" %</b> · "+pl(no.length,"notée")+" · "+pl(el,"élaguée"));}break;
+  case "developpement":var dv=A.filter(function(n){return n.decision==="developper";}).length,im=A.filter(function(n){return n.decision==="impasse";}).length;if(dv||im)L.push(pl(dv,"développée")+" · "+pl(im,"impasse"));break;
+  case "decision_n1":if(p.verdict==="sans_palier")L.push("<span class='ko'>Non</span> · nouvelle stratégie");else if(x.num!=null)L.push("<b>Oui</b> · branche "+E(x.num)+" à l'examen");break;
+  case "examen":if(x.note!=null){L.push("<b>"+f1(x.note)+" %</b> · "+pts(x.delta)+" vs meilleure");if(x.vitesse!=null)L.push(f1(x.vitesse)+" s/"+UV+condTxt(x.conditions));}break;
+  case "recorrection":var rc=x.recorrection||{};if(rc.delta!=null)L.push("<b>"+pts(rc.delta)+"</b> · mêmes "+UN);else if(rc.err)L.push("<span class='ko'>en panne</span>");break;
+  case "verification":var vf=x.verification||{};if(vf.note!=null)L.push("<b>"+f1(vf.note)+" %</b>"+(vf.ancienne!=null?" · avant "+f1(vf.ancienne)+" %":""));break;
+  case "decision_n2":if(x.verdict)L.push(p.verdict==="progres"?"<b>"+E(p.decision)+"</b>":"<span class='ko'>"+E(p.decision)+"</span>");break;
+  case "methode":var n2=p.niveau2||{};if(n2.fait)(p.propositions&&p.propositions.length?p.propositions:[n2.texte]).forEach(function(t){L.push("• "+E(t));});break;}
+  return L;}
+function arbreRep(p){if(!(p.arbre||[]).length)return "";var o=OUV[p.tour]?" open":"";
+  return "<details class='ar'"+o+" ontoggle='OUV["+p.tour+"]=this.open' onclick='event.stopPropagation()'><summary>Arbre · "+pl(p.arbre.length,"branche")+(p.tour_entrainement?" · tour "+p.tour_entrainement:"")+"</summary>"+arbre(p)+"</details>";}
+var OUV={};
+function niveau(nv,p){return "<div class='niv'><b>"+NIV[nv][0]+"</b>"+(nv===1&&p.palier?"<span><strong class='seuil'>Seuil "+f1(p.palier)+" %</strong><small>meilleure + 20 pts</small></span>":"")+"</div>";}
+
+/* ---------- FRISE de la passe en cours : ou on en est + journal de chaque etape + mesures EN DIRECT par poste ---------- */
+function compteur(q){var h="<span class='cpt'><span class='n'>"+E(q.nom)+" · <b>"+f0(q.fait)+" / "+(q.total?f0(q.total):"…")+"</b></span><span class='b'><i style='width:"+q.pct+"%'></i></span><span class='p'>"+q.pct+" %</span>";
+  if(q.attente)h+="<span class='at'>en attente</span>";
+  if(q.postes&&q.postes.length)h+="<span class='ps'>"+q.postes.map(function(p){return "<span><b>"+E(p.poste)+"</b></span><span>"+f0(p.notes)+" notés</span><span class='e"+(p.actif?" on":"")+"'>"+E(p.etat)+"</span>";}).join("")+"</span>";
+  return h+"</span>";}
+function frise(){var el=document.getElementById("frise");
+  if(!PASSE||!PASSE.etapes){el.innerHTML="<div class='vide'>L'état de la passe se charge…</div>";return;}
+  if(!PASSE.etapes.length){el.innerHTML="<div class='vide'>Pas encore lancée</div>";return;}
+  var p=passeDe(PASSE.tour);
+  var et=PASSE.etapes.filter(function(e){return e.etat!=="saute"&&e.id!=="memoire"&&e.id!=="autres"&&e.id!=="depart";});
+  var nf=et.filter(function(e){return e.etat==="fait"||e.etat==="inutile";}).length,cur=et.filter(function(e){return e.etat==="encours";})[0];
+  var pos=cur?et.indexOf(cur)+1:nf,EM=PASSE.en_mesure||[];
+  var ail=EM.filter(function(q){return q.passe!=null&&q.passe!==PASSE.tour;});
+  var h="<div class='fh' id='passe-"+E(PASSE.tour)+"'><b>"+(PASSE.tour===0?"Départ (étape 0)":"Passe "+E(PASSE.tour))+(PASSE.fin_run?" · arrêtée":"")+"</b><span>"+pos+" / "+et.length+"</span></div><div class='bar'><i style='width:"+Math.round(100*nf/Math.max(1,et.length))+"%'></i></div>";
+  if(PASSE.annonce)h+="<div class='k' style='margin:8px 0;padding:8px 10px;border-radius:8px;background:var(--warn-bg);color:var(--warn);font-weight:600'>"+E(PASSE.annonce)+"</div>";
+  var nivPrec=null;
+  et.forEach(function(e,i){var d=e.etat==="fait"?(e.duree?durS(e.duree):dur(e.debut,e.fin)):e.etat==="encours"?depuis(e.debut)+" ("+dur(e.debut)+")":e.etat==="inutile"?"sautée":"";
+    if(e.niveau&&e.niveau!==nivPrec){h+=niveau(e.niveau,{palier:PASSE.palier||p.palier});nivPrec=e.niveau;}
+    var L=(e.etat==="fait"||e.etat==="encours")?lignes(p,e.id):[],ENT=e.id==="entrainement"&&e.etat!=="avenir";
+    if(ENT)L=[];// « Meilleure · notées · élaguées » et les compteurs sont remplacés par En test maintenant + Résultats
+    if(!L.length&&e.resume&&e.etat!=="fait")L=[E(e.id==="methode"?"si 2 échecs · "+(H.echecs_examen||0)+" jusqu'ici":e.resume)];
+    h+="<div class='st "+e.etat+"' onclick='etape(\""+e.id+"\")'><span class='ic'>"+(e.etat==="fait"?"✓":e.etat==="encours"?"":e.etat==="inutile"?"–":(i+1))+"</span><span class='t'>"+E(e.titre)+"</span><span class='du'>"+d+"</span>"+
+      L.map(function(l){return "<span class='r'>"+l+"</span>";}).join("")+(ENT?enTest(p)+resultats(p)+"<div id='gN1' class='chart' onclick='event.stopPropagation()'></div>"+arbreRep(p):"")+
+      (e.etat==="encours"&&!ENT?(e.progres||[]).map(compteur).join(""):"")+"</div>";});
+  if(ail.length)h+="<div class='para'><div class='k'>En parallèle</div>"+ail.map(compteur).join("")+"</div>";
+  el.innerHTML=h;graphN1();document.getElementById("majp").textContent=PASSE.genere?"lu à "+hParis(PASSE.genere):"";}
+
+/* ---------- PASSES PRECEDENTES : meme rendu, condense (etapes qui ont un resultat) ---------- */
+function precedentes(){var el=document.getElementById("prec"),cur=PASSE?PASSE.tour:H.tour;
+  var P=(H.passes||[]).filter(function(p){return p.tour!==cur;}).slice().reverse();
+  if(!P.length){el.innerHTML="";return;}
+  var h="<h2>Passes précédentes</h2>";
+  P.forEach(function(p){var nivPrec=null;
+    h+="<article class='card frise pp' id='passe-"+p.tour+"'><div class='h'><b>Passe "+p.tour+"</b><span class='vd v-"+p.verdict+"'>"+VN[p.verdict]+"</span></div>";
+    (DATA.etapes||[]).forEach(function(m){var L=lignes(p,m.id);if(!L.length)return;
+      if(m.niveau&&m.niveau!==nivPrec){h+=niveau(m.niveau,p);nivPrec=m.niveau;}
+      h+="<div class='st fait' onclick='etape(\""+m.id+"\","+p.tour+")'><span class='ic'>✓</span><span class='t'>"+E(m.titre)+"</span><span class='du'>"+(m.id==="plan"&&p.plan&&p.plan.duree?durS(p.plan.duree):"")+"</span>"+
+        L.map(function(l){return "<span class='r'>"+l+"</span>";}).join("")+(m.id==="entrainement"?arbreRep(p):"")+"</div>";});
+    h+="</article>";});
+  el.innerHTML=h;}
+
+/* ---------- FENETRE D'UNE ETAPE : role (une ligne) + resultat + le detail qui ne tient pas dans la frise ---------- */
+function etape(id,t){var cour=t==null,e=cour?(PASSE.etapes||[]).filter(function(x){return x.id===id;})[0]:null,m=meta(id),p=passeDe(cour?PASSE.tour:t);
+  if(cour&&!e)return;var titre=(e&&e.titre)||m.titre,desc=(e&&e.desc)||m.desc,etat=e?e.etat:"fait";
+  var h="<div class='k' style='margin-top:0'>Passe "+E(p.tour!=null?p.tour:PASSE.tour)+" · "+(etat==="encours"?depuis(e.debut)+" ("+dur(e.debut)+")":etat==="fait"?(e&&e.debut?dur(e.debut,e.fin):"faite"):etat==="inutile"?"sautée":"à venir")+"</div><h3>"+E(titre)+"</h3>";
+  h+="<p class='muted'>"+E(desc)+"</p>";
+  var L=lignes(p,id),a=p.audit||{},x=p.examen||{};
+  if(L.length&&id!=="plan")h+="<div class='k'>Résultat</div>"+L.map(function(l){return "<p>"+l+"</p>";}).join("");
+  else if(e&&e.resume&&etat!=="fait")h+="<div class='k'>"+(etat==="inutile"?"Sautée":etat==="encours"?"En cours":"Condition")+"</div><p>"+E(e.resume)+"</p>";
+  if(id==="audit"&&a.fait)h+="<div class='k'>Causes</div>"+(a.causes||[]).map(function(c){return "<div class='cause'>"+(c.cas?"<span class='num'>"+c.cas+" cas</span> · ":"")+E(c.texte||"")+"</div>";}).join("");
+  if(id==="plan"){var A0=(p.arbre||[]).filter(function(n){return n.profondeur===1;}).sort(function(a,b){return a.id-b.id;}),pd=p.plan||{},dd=pd.durees||{};
+    if(A0.length)h+="<div class='k'>Pistes retenues</div>"+A0.map(function(n){return "<p>"+E(n.court||n.changement)+"</p>";}).join("");
+    if(p.strategie)h+="<div class='k'>Stratégie</div><p>"+E(p.strategie)+"</p>";if(p.alerte)h+="<p style='color:var(--warn)'>⚠ "+E(p.alerte)+"</p>";
+    if(p.plan){h+="<div class='k'>Critique · "+(pd.n_critiques?pl(pd.n_critiques,"point"):"aucun point")+"</div>"+(pd.critiques||[]).map(function(c){return "<p>• "+E(c)+"</p>";}).join("");
+      h+="<div class='k'>Correction</div><p>"+(pd.corrigee?"Stratégie corrigée":"Rien à corriger")+"</p>";
+      if(pd.duree)h+="<div class='k'>Durée</div><p>"+[["strategie","stratégie"],["critique","critique"],["correction","correction"]].filter(function(k){return dd[k[0]];}).map(function(k){return k[1]+" "+durS(dd[k[0]]);}).join(" · ")+"</p>";}}
+  if(id==="examen"&&x.gagnes!=null)h+="<div class='k'>Mêmes "+UN+"</div><p>"+x.gagnes+" gagnés · "+x.perdus+" perdus</p>";
+  if(e&&etat==="encours")(e.progres||[]).forEach(function(q){h+="<p>"+E(q.nom)+" · <b>"+f0(q.fait)+" / "+(q.total?f0(q.total):"…")+"</b></p>";});
+  if(e&&e.refus)h+="<p style='color:var(--ko)'>Refus d'agent : "+e.refus+"</p>";
+  ouvre(h);}
+/* ---------- GRAPHIQUES : un point par passe = le MEILLEUR essai ; champion en escalier ; zone a viser ---------- */
+var METS={q:{nom:"Qualité",c:"var(--sQ)",unite:" %",get:function(o){return o&&o.note;},cats:1},
+  v:{nom:"Vitesse",c:"var(--sV)",unite:" s",get:function(o){return o&&o.vitesse;},bas:1},
+  t:{nom:"Coût",c:"var(--sT)",unite:" jetons",get:function(o){return o&&o.tokens;},bas:1}};
+function colonnes(get,getC){// Depart + chaque passe : {lab, v (meilleur essai), ch (champion apres), encours}
+  var out=[],dep=H.depart;if(dep)out.push({lab:"Départ",court:"Départ",v:get(dep),ch:get(dep),tour:0});
+  (H.passes||[]).forEach(function(p){out.push({lab:"Passe "+p.tour,court:"P"+p.tour,v:p.meilleur?get(p.meilleur):null,ch:getC(p.champion),tour:p.tour,encours:p.verdict==="encours",verdict:p.verdict,best:p.meilleur});});
+  return out;}
+function graphe(el,o){var cols=o.cols,W=Math.max(260,Math.round(el.clientWidth-16)),Hh=o.h,L=o.small?26:34,R=o.small?10:16,T=16,B=24,pw=W-L-R,ph=Hh-T-B,N=cols.length;
+  var vals=[];cols.forEach(function(c){if(c.v!=null)vals.push(c.v);if(c.ch!=null)vals.push(c.ch);});
+  if(!vals.length){el.innerHTML=(o.titre||"")+"<div class='vide'>"+E(o.vide||"Pas encore de mesure.")+"</div>";return;}
+  var y0=o.y0!=null?o.y0:0,y1=o.y1!=null?o.y1:Math.max.apply(null,vals.concat(o.zone?[o.zone[1]]:[]))*1.15;
+  if(o.zone&&!o.y1)y1=Math.max(y1,o.zone[1]*1.1);
+  var st=o.step||(function(){var r=(y1-y0)/4,e=Math.pow(10,Math.floor(Math.log10(r))),f=r/e;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e;})();y1=Math.ceil(y1/st)*st;
+  var Y=function(v){return T+ph-(v-y0)/(y1-y0)*ph;},X=function(i){return L+(N<2?pw/2:18+i*(pw-36)/(N-1));};
+  var g="<svg viewBox='0 0 "+W+" "+Hh+"' role='img' aria-label='"+E(o.aria)+"'>";
+  for(var t=y0;t<=y1+1e-9;t+=st)g+="<line x1='"+L+"' x2='"+(W-R)+"' y1='"+Y(t)+"' y2='"+Y(t)+"' stroke='var(--grid)'/><text x='"+(L-6)+"' y='"+(Y(t)+3.5)+"' text-anchor='end' style='font:10px var(--mono);fill:var(--soft)'>"+f0(t)+"</text>";
+  if(o.zone){var za=Y(Math.min(y1,o.zone[1])),zb=Y(o.zone[0]);g+="<rect x='"+L+"' y='"+za+"' width='"+pw+"' height='"+(zb-za)+"' fill='var(--zone)'/><line x1='"+L+"' x2='"+(W-R)+"' y1='"+zb+"' y2='"+zb+"' stroke='var(--zone-line)' stroke-dasharray='4 3'/>"+
+    (o.small?"":"<text x='"+(W-R-4)+"' y='"+(zb-5)+"' text-anchor='end' style='font:600 10.5px var(--sans);fill:var(--zone-line)'>zone à viser</text>");}
+  // champion : escalier
+  var cp=[];cols.forEach(function(c,i){if(c.ch!=null)cp.push([i,c.ch]);});
+  if(cp.length){var d="M"+X(cp[0][0])+","+Y(cp[0][1]);for(var k=1;k<cp.length;k++)d+=" H"+X(cp[k][0])+" V"+Y(cp[k][1]);
+    g+="<path d='"+d+"' fill='none' stroke='var(--champ)' stroke-width='1.6' stroke-dasharray='5 3' opacity='.7'/>";}
+  // meilleur essai de chaque passe : points relies
+  var pp=[];cols.forEach(function(c,i){if(c.v!=null)pp.push([i,c.v]);});
+  if(pp.length>1)g+="<polyline fill='none' stroke='"+o.c+"' stroke-width='2.4' stroke-linejoin='round' points='"+pp.map(function(q){return X(q[0])+","+Y(q[1]);}).join(" ")+"'/>";
+  cols.forEach(function(c,i){var x=X(i);
+    if(c.v!=null){g+="<circle cx='"+x+"' cy='"+Y(c.v)+"' r='"+(o.small?3.6:5)+"' fill='"+o.c+"' stroke='"+o.c+"' stroke-width='2'/>";
+      g+="<text x='"+x+"' y='"+(Y(c.v)-(o.small?7:10))+"' text-anchor='middle' style='font:700 "+(o.small?9.5:11.5)+"px var(--sans);fill:var(--ink);paint-order:stroke;stroke:var(--panel);stroke-width:4px'>"+o.fmt(c.v)+"</text>";}
+    else if(c.encours){var ye=c.ch!=null?Y(c.ch):T+ph/2;g+="<circle cx='"+x+"' cy='"+ye+"' r='"+(o.small?3.6:5)+"' fill='var(--panel)' stroke='var(--brand)' stroke-width='1.6' stroke-dasharray='2 2'/>";
+      if(!o.small)g+="<text x='"+x+"' y='"+(ye+18)+"' text-anchor='middle' style='font:600 10px var(--sans);fill:var(--brand)'>en cours</text>";}
+    g+="<text x='"+x+"' y='"+(Hh-6)+"' text-anchor='middle' style='font:600 "+(o.small?9.5:10.5)+"px var(--sans);fill:var(--soft)'>"+E(o.small||N>5&&mob()?c.court:c.lab)+"</text>";
+    if(o.clic)g+="<rect class='hit' data-i='"+i+"' x='"+(x-Math.max(14,pw/N/2))+"' y='"+T+"' width='"+Math.max(28,pw/N)+"' height='"+(ph+B)+"' fill='transparent'/>";});
+  el.innerHTML=(o.titre||"")+g+"</svg>"+(o.legende||"");
+  if(o.clic)el.querySelectorAll(".hit").forEach(function(r){r.onclick=function(){o.clic(cols[+r.dataset.i]);};});}
+function seg(){var s=document.getElementById("seg");s.innerHTML=Object.keys(METS).map(function(k){return "<button class='"+(k===MET?"on":"")+"' onclick='MET=\""+k+"\";graphes()'>"+METS[k].nom+"</button>";}).join("");}
+function graphes(){seg();var m=METS[MET],C=cible(),ov=DATA.obj_vitesse||{};
+  var cols=colonnes(m.get,m.get);
+  var lg="<div class='lg'><span><i style='width:9px;height:9px;border-radius:50%;background:"+m.c+"'></i>essai passé à l'examen</span><span><i style='width:18px;border-top:2px dashed var(--champ);opacity:.7'></i>meilleure version</span><span>notes d'examen seulement</span>"+
+    (MET==="q"&&C?"<span><i style='width:14px;height:10px;background:var(--zone);border-bottom:1.5px dashed var(--zone-line)'></i>zone à viser ("+f0(C.minimum)+"–"+f0(C.ideal)+" %)</span>":"")+
+    (MET==="v"&&ov.minimum?"<span><i style='width:14px;height:10px;background:var(--zone);border-bottom:1.5px dashed var(--zone-line)'></i>zone à viser ("+ov.ideal+"–"+ov.minimum+" s par "+UV+")</span>":"")+
+    (MET!=="q"?"<span>plus bas = mieux</span>":"")+"</div>";
+  graphe(document.getElementById("gMain"),{cols:cols,h:mob()?230:280,c:m.c,aria:m.nom+" par passe",y0:0,y1:MET==="q"?100:null,step:MET==="q"?25:null,
+    zone:MET==="q"&&C?[C.minimum,C.ideal]:MET==="v"&&ov.minimum?[ov.ideal,ov.minimum]:null,
+    fmt:MET==="q"?function(v){return f1(v);}:MET==="v"?function(v){return f1(v)+" s";}:function(v){return f0(v);},legende:lg,
+    vide:"La "+m.nom.toLowerCase()+" n'a pas encore été mesurée.",clic:voirPasse});
+  var gc=document.getElementById("gCats");gc.innerHTML="";
+  DATA.cats.forEach(function(c){var d=document.createElement("div");d.className="card chart";gc.appendChild(d);var z=cible(c);
+    var get=function(o){return o&&o.cats?o.cats[c]:null;};var cl=colonnes(get,get),ch=H.champion&&H.champion.cats?H.champion.cats[c]:null;
+    graphe(d,{cols:cl,h:mob()?150:170,small:1,c:"var(--sQ)",y0:0,y1:100,step:50,zone:z?[z.minimum,z.ideal]:null,fmt:function(v){return f0(v);},aria:NOMS[c],
+      titre:"<div class='ct'><span>"+(mob()?COURT[c]:NOMS[c])+"</span><small>"+(z?"cible "+f0(z.minimum)+"–"+f0(z.ideal):"")+"</small></div>",
+      vide:"Pas encore de note pour cette catégorie.",clic:voirPasse});});}
+function voirPasse(c){if(!c)return;if(c.tour===0){var d=H.depart;ouvre("<div class='k' style='margin-top:0'>Départ</div><h3>Version de départ</h3><p style='margin-top:6px'>"+E(d.texte)+"</p><div class='k'>Note</div><p><b>"+f1(d.note)+" %</b> sur "+f0(d.n)+" "+UN+".</p>");return;}
+  var p=(H.passes||[]).filter(function(x){return x.tour===c.tour;})[0];if(!p)return;
+  var h="<div class='k' style='margin-top:0'>Passe "+p.tour+"</div><h3><span class='vd v-"+p.verdict+"'>"+VN[p.verdict]+"</span></h3>";
+  h+="<div class='k'>Meilleur essai</div><p>"+(p.meilleur?"« "+E(p.meilleur.titre)+" » : <b>"+f1(p.meilleur.note)+" %</b>":"Pas encore mesuré.")+"</p>";
+  h+="<div class='k'>Décision</div><p>"+E(p.decision)+"</p><p style='margin-top:10px'><a href='#passe-"+p.tour+"' onclick='ferme()'>Voir la passe ›</a></p>";ouvre(h);}
+
+/* ---------- ENTRAINEMENT DE L'ARBRE, en tete de l'etape : EN TEST MAINTENANT + RESULTATS DES BRANCHES ----------
+   Sources : PASSE.en_mesure (etat-passe.py : compteur exact du juge, postes, derniere lecture de l'ARRET SEQUENTIEL
+   sequentiel_lecture du journal du juge) et l'arbre (journal-arbre.jsonl). Rien n'est invente. */
+var DEC_F={developper:"développée",garder:"gardée",elaguer:"élaguée",impasse:"impasse",panne:"panne",examen:"examen",ecarte:"écartée"};
+function famsN1(){var G=H.entrainement_graphe||{},P=G.points||[],R=G.racines||[],cy=H.cycle||null,r0=cy?R.filter(function(r){return r.tour===cy.tour;})[0]:R[R.length-1];
+  if(r0)P=P.filter(function(p){return !p.archive&&p.jeu===r0.jeu&&p.t>=r0.t;});var f=[];P.forEach(function(p){if(p.famille&&f.indexOf(p.famille)<0)f.push(p.famille);});return f;}
+function famTxt(f,F){if(!f)return "";var i=F.indexOf(f);return "<i class='fd' style='background:"+(i>=0&&i<3?"var(--f"+(i+1)+")":"var(--fz)")+"'></i>"+E(f);}
+function valN(n){return n.note!=null?n.note:(n.arret_tot?n.arret_tot.est:null);}
+function ecartN(n){var e=n.ecart_parent||{};return e.exact!=null?sg(e.exact):e.est!=null?"≈ "+sg(e.est):"";}
+function parentTxt(p,n){if(!n.parent)return "racine"+(p.racine&&p.racine.note!=null?" · "+f1(p.racine.note)+" %":"");
+  var q=(p.arbre||[]).filter(function(x){return x.id===n.parent;})[0];return q?E(q.court||q.changement)+" · "+(q.note!=null?f1(q.note)+" %":q.arret_tot?"≈ "+f1(q.arret_tot.est)+" %":"pas notée"):"branche "+n.parent;}
+function enTest(p){var F=famsN1(),EM=(PASSE.en_mesure||[]).filter(function(q){return q.graine==="entrainement"&&q.passe===PASSE.tour&&!q.attente;});
+  if(!EM.length)return "";
+  var h="<div class='et' onclick='event.stopPropagation()'><div class='k'>En test maintenant</div>";
+  EM.forEach(function(q){var n=(p.arbre||[]).filter(function(x){return x.id===q.branche&&q.tour_branche===p.tour;})[0]||{},lc=q.lecture,fin=q.total&&q.fait>=q.total;
+    var ti=n.court||n.changement||q.titre||q.nom,no="",li=[];
+    if(lc&&lc.est!=null&&lc.decision==="continuer"){li.push("<b>≈ "+f1(lc.est)+" % ["+f0(lc.bas)+"–"+f0(lc.haut)+"]</b> · écart au parent <b>"+sg(lc.ecart)+"</b> · peut s'arrêter tôt");}
+    else if(lc&&lc.est!=null){no=f1(lc.est)+" %";li.push("<b>"+(fin?"notée":"arrêtée tôt")+"</b> · écart au parent <b>"+sg(lc.ecart)+"</b> · décision en cours");}
+    else if(q.sequentiel)li.push("peut s'arrêter tôt · 1re estimation à venir");
+    h+="<div class='eq'><span class='ti'>"+E(ti)+(q.branche!=null?"<small>branche "+q.branche+"</small>":"")+"</span><span class='no'>"+no+"</span>";
+    h+="<span class='li'>"+(n.famille?famTxt(n.famille,F)+" · ":"")+"parent : "+(n.id?parentTxt(p,n):"—")+"</span>";
+    h+="<span class='ba'><span><i style='width:"+q.pct+"%'></i></span><em>"+f0(q.fait)+" / "+(q.total?f0(q.total):"…")+" "+UN+"</em></span>";
+    li.forEach(function(l){h+="<span class='li'>"+l+"</span>";});
+    var po=(q.postes||[]).filter(function(x){return x.notes>0||x.actif;});
+    if(po.length)h+="<span class='po'>"+po.map(function(x){return "<span class='"+(x.actif?"on":"")+"'>"+E(x.poste)+" <b>"+f0(x.notes)+"</b></span>";}).join("")+"</span>";
+    else h+="<span class='li'>en attente d'un poste</span>";
+    h+="</div>";});
+  return h+"</div>";}
+function resultats(p){var A=p.arbre||[],F=famsN1();
+  var M=A.filter(function(n){return n.decision!=="a entrainer";});if(!M.length)return "";
+  M=M.slice().sort(function(a,b){var va=valN(a),vb=valN(b);if(va==null&&vb==null)return a.id-b.id;if(va==null)return 1;if(vb==null)return -1;return vb-va;});
+  var co=M.filter(function(n){return n.note!=null;}),best=co.length?co.reduce(function(m,n){return n.note>m.note?n:m;}):null;
+  var enT=(PASSE.en_mesure||[]).filter(function(q){return q.graine==="entrainement"&&q.passe===PASSE.tour&&!q.attente;}).map(function(q){return q.branche;});
+  var file=A.filter(function(n){return n.decision==="a entrainer"&&enT.indexOf(n.id)<0;}).length;
+  var h="<div class='res' onclick='event.stopPropagation()'><div class='k'>Résultats<small>racine "+(p.racine&&p.racine.note!=null?f1(p.racine.note)+" %":"—")+(p.palier?" · seuil "+f1(p.palier)+" %":"")+"</small></div>";
+  M.forEach(function(n){var i=A.indexOf(n),v=valN(n),dc=(n.decision_txt==="examen"||n.decision_txt==="à l'examen")?"examen":n.decision,ec=ecartN(n);
+    var no=n.note!=null?f1(n.note)+" %":n.arret_tot?"≈ "+f1(n.arret_tot.est)+" %":"—";
+    h+="<div class='rl"+(n===best?" best":"")+(v==null||dc==="elaguer"||dc==="impasse"?" faible":"")+"' onclick='voirNoeud("+p.tour+","+i+")' style='cursor:pointer'><span class='ti'>"+E(n.court||n.changement)+"</span><span class='no'>"+no+"</span>";
+    h+="<span class='me'>"+(n===best?"<b>meilleure</b> · ":"")+(n.arret_tot?"arrêtée tôt ["+f0(n.arret_tot.bas)+"–"+f0(n.arret_tot.haut)+"] · ":"")+(ec?"parent "+ec+" · ":"")+"<span class='dc d-"+E(dc)+"'>"+E(DEC_F[dc]||n.decision_txt)+"</span>"+(n.famille?" · "+famTxt(n.famille,F):"")+"</span></div>";});
+  if(file)h+="<div class='fi'>en file : "+file+"</div>";
+  return h+"</div>";}
+/* ---------- ARBRE du niveau 1 (journal-arbre.jsonl) ---------- */
+function arbre(p){var A=p.arbre||[];if(!A.length)return "<p class='muted'>en fabrication</p>";
+  var enf={};A.forEach(function(n){(enf[n.parent]=enf[n.parent]||[]).push(n);});
+  var h="<div class='arbre'><div class='nd racine'><span class='c'><b>Racine</b><small>meilleur essai d'entraînement</small></span><span class='n'>"+(p.racine&&p.racine.note!=null?f1(p.racine.note)+" %":"")+"</span></div>";
+  var pas=mob()?12:18;
+  function rec(pid){(enf[pid]||[]).sort(function(a,b){return a.id-b.id;}).forEach(function(n){var i=A.indexOf(n);
+    h+="<div class='nd "+E(n.decision==="a entrainer"?"a":n.decision)+"' style='margin-left:"+(n.profondeur*pas)+"px' onclick='voirNoeud("+p.tour+","+i+")'><i class='ind'></i><span class='c'>"+E(n.court||n.changement)+"<small>"+n.id+" · "+E(n.decision_txt)+(n.famille?" · "+E(n.famille):"")+(n.arret_tot?" · arrêté tôt":"")+"</small></span><span class='n'>"+noteN(n)+"</span></div>";rec(n.id);});}
+  rec(0);return h+"</div>";}
+/* (arret sequentiel) : un noeud ARRETE TOT par le juge n'a pas de note complete, seulement un encadrement sur */
+function totTxt(n){var a=n&&n.arret_tot;return a?"arrêté tôt · ~"+f1(a.est)+" % ["+f0(a.bas)+"–"+f0(a.haut)+"]":"";}
+function noteN(n){return n.note!=null?f1(n.note)+" %":(n.arret_tot?"~"+f0(n.arret_tot.est)+" %":"…");}
+function voirNoeud(t,i){var p=(H.passes||[]).filter(function(x){return x.tour===t;})[0],n=p&&p.arbre[i];if(!n)return;
+  var par=n.parent?(p.arbre.filter(function(x){return x.id===n.parent;})[0]):null;
+  var h="<div class='k' style='margin-top:0'>Passe "+t+" · branche "+n.id+"</div><h3>"+E(n.court||n.changement)+"</h3>";
+  h+="<p><b>"+(n.note!=null?f1(n.note)+" %":(n.arret_tot?totTxt(n):"pas notée"))+"</b> entraînement · "+E(n.decision_txt)+"</p>";
+  if(n.arret_tot){var ep=n.ecart_parent||{};h+="<div class='k'>Mesure arrêtée tôt</div><p>"+f0(n.arret_tot.n)+" / "+f0(n.arret_tot.N)+" "+UN+(ep.bas!=null?" · écart au parent "+pts(ep.bas)+" à "+pts(ep.haut):"")+"</p>";}
+  if(n.famille)h+="<div class='k'>Famille d'idées</div><p>"+E(n.famille)+"</p>";
+  if(n.cats)h+="<div class='chips'>"+DATA.cats.map(function(c){return n.cats[c]!=null?"<span>"+COURT[c]+" <b>"+f0(n.cats[c])+"</b></span>":"";}).join("")+"</div>";
+  if(n.court&&n.changement&&n.changement!==n.court)h+="<div class='k'>Idée</div><p>"+E(n.changement)+"</p>";
+  h+="<div class='k'>Parent</div><p>"+(par?"branche "+par.id+" · "+(par.note!=null?f1(par.note)+" %":(totTxt(par)||"pas notée")):"racine · "+(p.racine&&p.racine.note!=null?f1(p.racine.note)+" %":"—"))+"</p>";
+  if(n.examen&&n.examen.note!=null)h+="<div class='k'>Examen</div><p>"+f1(n.examen.note)+" %"+(n.examen.delta!=null?" · "+pts(n.examen.delta):"")+"</p>";
+  if(n.vitesse!=null)h+="<div class='k'>Vitesse</div><p>"+f1(n.vitesse)+" s/"+UV+condTxt(n.conditions)+"</p>";
+  if(n.quand)h+="<p class='muted'>Noté "+E(utcParis(n.quand))+"</p>";
+  ouvre(h);}
+function condTxt(c){if(!c||!c.length)return "";var gpu=c.filter(function(x){return x.calcul==="GPU";}).length;
+  return " · "+c.length+" poste"+(c.length>1?"s":"")+(gpu===c.length?" GPU":gpu?" ("+gpu+" GPU)":" CPU")+" · pas téléphone";}
+/* ---------- fenetre, rafraichissement ---------- */
+function ouvre(h){document.getElementById("mbox").innerHTML="<button class='x' aria-label='Fermer' onclick='ferme()'>×</button>"+h;document.getElementById("modal").hidden=false;}
+function ferme(){document.getElementById("modal").hidden=true;}
+document.getElementById("modal").onclick=function(ev){if(ev.target===this)ferme();};
+document.addEventListener("keydown",function(e){if(e.key==="Escape")ferme();});
+/* GRAPHIQUE DE TOUTES LES TENTATIVES NOTEES A L'ENTRAINEMENT (niveau 1), donnees = H.entrainement_graphe
+   (journal.py, depuis journal-arbre.jsonl + archives). X = heure de mesure (Paris), Y = note moyenne d'entrainement ; un point
+   par essai (couleur = famille, forme = decision) ; escalier = meilleure version a l'entrainement ; ligne du SEUIL actuel sur le
+   jeu en cours. Notes de jeux differents non comparables : l'axe est COUPE a chaque changement de jeu (trait vertical). */
+var DEC_N1={garde:"gardé",elague:"élagué",impasse:"impasse",examen:"palier franchi",autre:"autre"};
+var FMT_HH=new Intl.DateTimeFormat("fr-FR",{timeZone:"Europe/Paris",hour:"numeric",hourCycle:"h23"});
+var FMT_JC=new Intl.DateTimeFormat("fr-FR",{timeZone:"Europe/Paris",day:"numeric",month:"short"});
+function jeuNom(j){var m=/v(\d+)/i.exec(j||"");return m?"Jeu V"+m[1]:"Jeu";}
+function formeN1(cl,x,y,r,c){
+  if(cl==="elague")return "<circle cx='"+x+"' cy='"+y+"' r='"+(r-0.5)+"' fill='var(--panel)' stroke='"+c+"' stroke-width='2' opacity='.7'/>";
+  if(cl==="impasse"){var a=r*0.8;return "<path d='M"+(x-a)+","+(y-a)+"L"+(x+a)+","+(y+a)+"M"+(x-a)+","+(y+a)+"L"+(x+a)+","+(y-a)+"' stroke='var(--panel)' stroke-width='5' stroke-linecap='round'/><path d='M"+(x-a)+","+(y-a)+"L"+(x+a)+","+(y+a)+"M"+(x-a)+","+(y+a)+"L"+(x+a)+","+(y-a)+"' stroke='"+c+"' stroke-width='2.2' stroke-linecap='round'/>";}
+  if(cl==="examen"){var d=r*1.35;return "<path d='M"+x+","+(y-d)+"L"+(x+d)+","+y+"L"+x+","+(y+d)+"L"+(x-d)+","+y+"Z' fill='"+c+"' stroke='var(--panel)' stroke-width='2'/>";}
+  if(cl==="autre")return "<rect x='"+(x-r+1)+"' y='"+(y-r+1)+"' width='"+(2*r-2)+"' height='"+(2*r-2)+"' fill='var(--panel)' stroke='"+c+"' stroke-width='2'/>";
+  return "<circle cx='"+x+"' cy='"+y+"' r='"+r+"' fill='"+c+"' stroke='var(--panel)' stroke-width='2'/>";}
+function graphN1(){var el=document.getElementById("gN1");if(!el)return;var G=H.entrainement_graphe||{},P=G.points||[],R=G.racines||[],X_=[];
+  // UNE seule ligne de temps continue, depuis la relance de la passe en cours (jeu actuel) ; ni essais d'hier, ni coupure
+  var cy0=H.cycle||null,r0c=cy0?R.filter(function(r){return r.tour===cy0.tour;})[0]:R[R.length-1];
+  if(r0c){P=P.filter(function(p){return !p.archive&&p.jeu===r0c.jeu&&p.t>=r0c.t;});R=[r0c];}
+  if(!P.length){el.innerHTML="<div class='vide'>Aucun essai noté pour l'instant.</div>";return;}
+  // familles : ordre de premiere apparition (la couleur suit la famille, jamais son rang) ; 3 couleurs, le reste en gris
+  var fams=[];P.forEach(function(p){if(p.famille&&fams.indexOf(p.famille)<0)fams.push(p.famille);});
+  function coul(p){if(p.archive)return "var(--fz)";var i=fams.indexOf(p.famille);return i>=0&&i<3?"var(--f"+(i+1)+")":"var(--fz)";}
+  // segments = suites d'evenements (essais + meilleures versions) sur le meme jeu
+  var ev=P.map(function(p){return {t:p.t,jeu:p.jeu};}).concat(R.map(function(r){return {t:r.t,jeu:r.jeu};})).sort(function(a,b){return a.t-b.t;});
+  var S=[];ev.forEach(function(e){var s=S[S.length-1];if(!s||s.jeu!==e.jeu)S.push({jeu:e.jeu,a:e.t,b:e.t});else s.b=e.t;});
+  var cyc=H.cycle||null,rc=cyc?R.filter(function(r){return r.tour===cyc.tour;})[0]:null,now=Date.now()/1000;
+  var sc=rc?S.filter(function(s){return s.jeu===rc.jeu&&s.b>=rc.t;}).pop():null;if(sc&&sc===S[S.length-1])sc.b=Math.max(sc.b,now);
+  S.forEach(function(s){if(s.b-s.a<1800){var m=(s.a+s.b)/2;s.a=m-900;s.b=m+900;}s.a-=600;s.b+=600;});
+  var seuil=rc&&rc.palier!=null?rc.palier:(cyc&&cyc.palier!=null?cyc.palier:null);
+  var W=Math.max(280,Math.round(el.clientWidth-16)),Hh=mob()?250:300,L=30,Rr=8,T=10,B=24,pw=W-L-Rr,ph=Hh-T-B,gap=S.length>1?20:0;
+  var av=pw-gap*(S.length-1),tot=S.reduce(function(a,s){return a+(s.b-s.a);},0);
+  S.forEach(function(s){s.w=(s.b-s.a)/tot*av;});var mn=av*0.26;S.forEach(function(s){if(s.w<mn)s.w=mn;});
+  var sw=S.reduce(function(a,s){return a+s.w;},0);var x0=L;S.forEach(function(s){s.w=s.w*av/sw;s.x=x0;x0+=s.w+gap;});
+  function X(t,jeu){var s=S.filter(function(q){return q.jeu===jeu&&t>=q.a-1&&t<=q.b+1;})[0]||S[S.length-1];return s.x+(t-s.a)/(s.b-s.a)*s.w;}
+  var vs=P.map(function(p){return p.note;}).concat(R.map(function(r){return r.note;}));if(seuil!=null)vs.push(seuil);
+  var y0=Math.max(0,Math.floor((Math.min.apply(null,vs)-4)/10)*10),y1=Math.min(100,Math.ceil((Math.max.apply(null,vs)+4)/10)*10),st=(y1-y0)>60?20:10;
+  function Y(v){return T+ph-(v-y0)/(y1-y0)*ph;}
+  var g="<svg viewBox='0 0 "+W+" "+Hh+"' role='img' aria-label=\"Notes d'entraînement de chaque essai dans le temps\">";
+  for(var v=y0;v<=y1+1e-9;v+=st)g+="<line x1='"+L+"' x2='"+(W-Rr)+"' y1='"+Y(v)+"' y2='"+Y(v)+"' stroke='var(--grid)'/><text x='"+(L-5)+"' y='"+(Y(v)+3.5)+"' text-anchor='end' style='font:10px var(--mono);fill:var(--soft)'>"+v+"</text>";
+  S.forEach(function(s,i){// titre du segment + heures (Paris)
+    var pas=[1,2,3,4,6,12].filter(function(h){return s.w/((s.b-s.a)/3600/h)>=40;})[0]||24;
+    for(var t=Math.ceil(s.a/3600)*3600;t<=s.b;t+=3600){var hh=parseInt(FMT_HH.format(new Date(t*1000)),10);if(hh%pas)continue;var x=s.x+(t-s.a)/(s.b-s.a)*s.w;
+      g+="<line x1='"+x+"' x2='"+x+"' y1='"+(T+ph)+"' y2='"+(T+ph+4)+"' stroke='var(--soft)'/><text x='"+x+"' y='"+(Hh-7)+"' text-anchor='middle' style='font:10px var(--sans);fill:var(--soft)'>"+hh+" h</text>";}
+    if(i>0){var xb=s.x-gap/2;g+="<line x1='"+xb+"' x2='"+xb+"' y1='"+(T-18)+"' y2='"+(T+ph)+"' stroke='var(--ink)' stroke-width='1.5' stroke-dasharray='3 3' opacity='.55'/>";}});
+  // meilleure version a l'entrainement : escalier, dans chaque segment
+  S.forEach(function(s){var rs=R.filter(function(r){return r.jeu===s.jeu&&r.t>=s.a&&r.t<=s.b;});if(!rs.length)return;var d="";
+    rs.forEach(function(r,k){var xa=X(r.t,s.jeu),xe=k+1<rs.length?X(rs[k+1].t,s.jeu):s.x+s.w;d+=(k?" V":"M"+xa+",")+Y(r.note)+" H"+xe;});
+    g+="<path d='"+d+"' fill='none' stroke='var(--champ)' stroke-width='1.8' stroke-dasharray='5 3' opacity='.75'/>";
+    var dr=rs[rs.length-1];g+="<text x='"+(s.x+s.w-2)+"' y='"+(Y(dr.note)+13)+"' text-anchor='end' style='font:600 10px var(--sans);fill:var(--soft);paint-order:stroke;stroke:var(--panel);stroke-width:3px'>meilleure "+f1(dr.note)+"</text>";});
+  // seuil actuel (meilleure + 20) sur le jeu en cours
+  if(seuil!=null&&sc){var ys=Y(seuil);g+="<line x1='"+sc.x+"' x2='"+(sc.x+sc.w)+"' y1='"+ys+"' y2='"+ys+"' stroke='var(--ok)' stroke-width='2.2'/>"+
+    "<text x='"+(sc.x+sc.w-2)+"' y='"+(ys-6)+"' text-anchor='end' style='font:800 11.5px var(--sans);fill:var(--ok);paint-order:stroke;stroke:var(--panel);stroke-width:4px'>Seuil "+f1(seuil)+" %</text>";}
+  // essais (les archives grisees d'abord, dessous)
+  var r0=mob()?4.5:5,hit="";
+  P.forEach(function(p,i){var x=X(p.t,p.jeu),y=Y(p.note);g+="<g"+(p.archive?" opacity='.45'":"")+">"+formeN1(p.classe,x,y,r0,coul(p))+"</g>";
+    hit+="<circle class='pt' data-i='"+i+"' cx='"+x+"' cy='"+y+"' r='12' fill='transparent' tabindex='0'/>";});
+  g+=hit+"</svg>";
+  // legende : familles, puis decisions et lignes
+  var cls={};P.forEach(function(p){cls[p.classe]=1;});var sansF=P.some(function(p){return !p.archive&&(!p.famille||fams.indexOf(p.famille)>=3);});
+  function ico(cl,c){return "<svg viewBox='-7 -7 14 14'>"+formeN1(cl,0,0,4.5,c)+"</svg>";}
+  var lg="<div class='lg lgN1'>"+fams.slice(0,3).map(function(f,i){return "<span><i style='width:10px;height:10px;border-radius:50%;background:var(--f"+(i+1)+")'></i>"+E(f)+"</span>";}).join("")+
+    (sansF?"<span><i style='width:10px;height:10px;border-radius:50%;background:var(--fz)'></i>"+(fams.length>3?"autres familles":"sans famille")+"</span>":"")+"</div>"+
+    "<div class='lg lgN1'>"+["garde","examen","elague","impasse","autre"].filter(function(k){return cls[k];}).map(function(k){return "<span>"+ico(k,"var(--soft)")+DEC_N1[k]+"</span>";}).join("")+
+    "<span><i style='width:18px;border-top:2px dashed var(--champ);opacity:.75'></i>meilleure version</span>"+(seuil!=null?"<span><i style='width:18px;border-top:2.2px solid var(--ok)'></i>seuil</span>":"")+
+    (S.length>1?"<span><i style='height:12px;border-left:1.5px dashed var(--ink);opacity:.55'></i>nouveau jeu : notes non comparables</span>":"")+"</div>";
+  var note=X_.map(function(x){return "<div class='noteN1'>"+E(x.nom.charAt(0).toUpperCase()+x.nom.slice(1))+" exclue · "+pl(x.n,"mesure")+" · "+E(x.raison)+"</div>";}).join("")+
+    (P.some(function(p){return p.archive;})?"<div class='noteN1'>En grisé : mesures sur l'ancien jeu</div>":"");
+  el.innerHTML=g+lg+note+"<div id='tipN1' hidden></div>";
+  var tip=el.querySelector("#tipN1"),cur=-1;
+  function montre(i,c){var p=P[i],box=el.getBoundingClientRect(),r=c.getBoundingClientRect();cur=i;
+    tip.innerHTML="<b class='v'>"+f1(p.note)+" %</b><div class='t'>"+E(p.titre)+"</div><div class='m'><i class='k' style='border-color:"+coul(p)+"'></i>"+E(p.archive?p.archive+" · ancien jeu":(p.famille||"sans famille"))+"</div>"+
+      "<div class='m'>"+E(p.decision||DEC_N1[p.classe])+" · passe "+p.tour+" · branche "+p.id+"</div><div class='m'>mesuré à "+E(hParis(p.t))+"</div>";
+    tip.hidden=false;var tw=tip.offsetWidth,th=tip.offsetHeight,cx=r.left+r.width/2-box.left,cy=r.top+r.height/2-box.top;
+    var lx=Math.min(Math.max(4,cx-tw/2),box.width-tw-4),ly=cy-th-14;if(ly<0)ly=cy+16;tip.style.left=lx+"px";tip.style.top=ly+"px";}
+  function cache(){tip.hidden=true;cur=-1;}
+  el.querySelectorAll(".pt").forEach(function(c){var i=+c.dataset.i;
+    c.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse")montre(i,c);});
+    c.addEventListener("focus",function(){montre(i,c);});c.addEventListener("blur",cache);
+    c.addEventListener("click",function(e){e.stopPropagation();montre(i,c);});});
+  el.querySelector("svg").addEventListener("pointerleave",function(e){if(e.pointerType==="mouse")cache();});
+  el.onclick=function(e){e.stopPropagation();cache();};}
+function tout(){hero();frise();precedentes();graphes();}
+function charge(){fetch("etat-passe.json?"+Date.now()).then(function(r){return r.json();}).then(function(d){PASSE=d;if(d.histoire&&d.histoire.passes)H=d.histoire;tout();
+  document.getElementById("maj").textContent="";}).catch(function(){});}
+tout();charge();setInterval(charge,30000);
+var rsz;addEventListener("resize",function(){clearTimeout(rsz);rsz=setTimeout(function(){graphN1();graphes();},150);});
+</script></body></html>

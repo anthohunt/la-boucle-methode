@@ -1,0 +1,11 @@
+{
+ "titre": "Consigne raccourcie",
+ "description": "Consigne raccourcie",
+ "famille": "retouche de la consigne",
+ "parent": null,
+ "journal": {
+  "probleme": "La consigne est longue et lente.",
+  "idee": "Retirer les règles redondantes.",
+  "attendu": "Même qualité, plus rapide."
+ }
+}

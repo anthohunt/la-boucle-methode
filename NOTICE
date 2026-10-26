@@ -1,0 +1,11 @@
+la-boucle-methode
+Copyright 2026 Anthony Hunt
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE) for its code
+(skills/dashboard-boucle/modele/, skills/dashboard-boucle/donnees-exemple/generer-donnees.py).
+The skill texts (skills/*/SKILL.md), the documentation and the synthetic example data are
+licensed under the Creative Commons Attribution 4.0 International license (see LICENSE-docs).
+
+This product includes no third-party code. It is inspired by karpathy/autoresearch
+(https://github.com/karpathy/autoresearch) and GEPA (https://github.com/gepa-ai/gepa, MIT License);
+no code was copied from either.

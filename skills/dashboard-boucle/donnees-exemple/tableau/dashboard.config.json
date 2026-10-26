@@ -1,0 +1,46 @@
+{
+ "titre": "Tickets → réservations (données d'exemple)",
+ "surtitre": "Boucle d'amélioration automatique",
+ "intro": "Données synthétiques : un petit modèle lit un message adressé à la bibliothèque fictive de Valbourg et doit en tirer les réservations à enregistrer. La boucle entraîne ses essais sur des cas dont elle voit les fautes, puis envoie à l'examen l'essai qui franchit un palier.",
+ "unite": [
+  "message",
+  "messages"
+ ],
+ "unite_vitesse": "message",
+ "categories": {
+  "claire": {
+   "nom": "Une réservation claire",
+   "court": "Claire"
+  },
+  "multiple": {
+   "nom": "Plusieurs réservations",
+   "court": "Plusieurs"
+  },
+  "floue": {
+   "nom": "Réservation floue",
+   "court": "Floue"
+  },
+  "vide": {
+   "nom": "Aucune réservation",
+   "court": "Aucune"
+  },
+  "piege": {
+   "nom": "Piège (fausse date)",
+   "court": "Piège"
+  },
+  "hostile": {
+   "nom": "Message malveillant",
+   "court": "Hostile"
+  }
+ },
+ "tailles": {
+  "entrainement": 120,
+  "examen": 240,
+  "verification": 90
+ },
+ "progres_min": 5.0,
+ "noms_postes": {
+  "poste-a": "machine-A",
+  "poste-b": "machine-B"
+ }
+}

@@ -1,0 +1,11 @@
+{
+ "titre": "Relecture finale de la liste",
+ "description": "Relecture finale de la liste de réservations",
+ "famille": "relecture / vérification",
+ "parent": null,
+ "journal": {
+  "probleme": "Des doublons apparaissent dans la liste rendue.",
+  "idee": "Un dernier appel supprime les doublons.",
+  "attendu": "La liste est propre."
+ }
+}
