@@ -1,4 +1,6 @@
-# Modèle du tableau de la boucle
+# La boucle dashboard template
+
+> This document is in French.
 
 Fichiers :
 • `tpl.html` : la page (autonome, CSS et JavaScript dedans). `generer.py` y injecte les données et écrit `index.html`.

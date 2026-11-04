@@ -52,10 +52,10 @@ The richer page here reads its own file format (see `skills/dashboard-boucle/mod
 
 ## Requirements and third-party software
 
-• Python ≥ 3.10, standard library only (dashboard generator). The page loads nothing from the network.
-• For the loop: the [engine](https://github.com/anthohunt/la-boucle-engine) (Apache 2.0), and for agent researchers [Claude Code](https://docs.claude.com/en/docs/claude-code), a separate Anthropic product under Anthropic's terms, only called, not redistributed.
-• Small models you choose are not distributed here (check each model's licence; for example IBM Granite 4.0 models are Apache 2.0 on their Hugging Face cards).
-• Referenced, not included: karpathy/autoresearch (no licence file in the repository at the time of writing, hence no code reuse), GEPA (MIT).
+- Python ≥ 3.10, standard library only (dashboard generator). The page loads nothing from the network.
+- For the loop: the [engine](https://github.com/anthohunt/la-boucle-engine) (Apache 2.0), and for agent researchers [Claude Code](https://docs.claude.com/en/docs/claude-code), a separate Anthropic product under Anthropic's terms, only called, not redistributed.
+- Small models you choose are not distributed here (check each model's licence; for example IBM Granite 4.0 models are Apache 2.0 on their Hugging Face cards).
+- Referenced, not included: karpathy/autoresearch (no licence file in the repository at the time of writing, hence no code reuse), GEPA (MIT).
 
 ## Licences
 
