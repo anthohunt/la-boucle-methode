@@ -2,7 +2,7 @@
 
 **La boucle** is a method to turn a business goal into an agent running on a **small local model**, with a quality that is *measured*, not assumed. A large model plays the researcher: it improves the *harness* around the small model (prompt, helper code, steps, model choice). It never grades its own work: a deterministic judge does, on cases the researcher cannot read.
 
-This repository holds the method as six [Claude Code skills](https://docs.claude.com/en/docs/claude-code/skills) (instructions an agent follows) plus a ready-made dashboard to follow a run. The engine that executes the loop is a separate repository, [`la-boucle-engine`](https://github.com/anthohunt/la-boucle-engine).
+This repository holds the method as six [Claude Code skills](https://code.claude.com/docs/en/skills) (instructions an agent follows) plus a ready-made dashboard to follow a run. The engine that executes the loop is a separate repository, [`la-boucle-engine`](https://github.com/anthohunt/la-boucle-engine).
 
 > The skills and the dashboard are written in French; this README is in English.
 
@@ -53,10 +53,14 @@ The richer page here reads its own file format (see `skills/dashboard-boucle/mod
 ## Requirements and third-party software
 
 - Python ≥ 3.10, standard library only (dashboard generator). The page loads nothing from the network.
-- For the loop: the [engine](https://github.com/anthohunt/la-boucle-engine) (Apache 2.0), and for agent researchers [Claude Code](https://docs.claude.com/en/docs/claude-code), a separate Anthropic product under Anthropic's terms, only called, not redistributed.
+- For the loop: the [engine](https://github.com/anthohunt/la-boucle-engine) (Apache 2.0), and for agent researchers [Claude Code](https://code.claude.com/docs/en/overview), a separate Anthropic product under Anthropic's terms, only called, not redistributed.
 - Small models you choose are not distributed here (check each model's licence; for example IBM Granite 4.0 models are Apache 2.0 on their Hugging Face cards).
 - Referenced, not included: karpathy/autoresearch (no licence file in the repository at the time of writing, hence no code reuse), GEPA (MIT).
 
 ## Licences
 
 Code (`skills/dashboard-boucle/modele/`, `generer-donnees.py`): **Apache 2.0** (`LICENSE`, `NOTICE`). Skill texts, documentation and synthetic data: **CC BY 4.0** (`LICENSE-docs`). Author: Anthony Hunt.
+
+---
+
+**Anthony Hunt** · [Project page on ingevision.cloud](https://ingevision.cloud/?lang=en&p=boucle) · [LinkedIn](https://www.linkedin.com/in/anthony-hunt-3948a9196) · [GitHub profile](https://github.com/anthohunt)
